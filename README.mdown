@@ -1,0 +1,35 @@
+Requirements
+============
+To run airplayer, you'll need:
+- Python (>= 2.5)
+- Pip
+- A compatible DNS-SD library (such as Avahi)
+
+Installing
+==========
+
+A compatible DNS-SD library
+---------------------------
+On OSX this is installed by default so you don't have to do anything.
+On Ubuntu you'll have to install a package, such as:
+    
+    apt-get install libavahi-compat-libdnssd1
+
+On other Linux distributions you'll have to install a similar package.         
+
+Python & Pip
+------------
+You can look that up on the internet ;)
+
+When you have Python and Pip installed execute the following command:
+
+    pip install -r requirements.txt
+    
+
+Get going
+=========
+Now edit settings.py to reflect your own xbmc setup and you should be ready to rock!
+
+Start airplayer by executing:
+    
+    python airplayer.py    
