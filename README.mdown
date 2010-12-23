@@ -1,9 +1,10 @@
 Requirements
 ============
 To run airplayer, you'll need:
-- Python (>= 2.5)
-- Pip
-- A compatible DNS-SD library (such as Avahi)
+
+* Python (>= 2.5)
+* Pip
+* A compatible DNS-SD library (such as Avahi)
 
 Installing
 ==========
