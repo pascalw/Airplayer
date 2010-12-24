@@ -3,3 +3,5 @@ XBMC_PORT = 8080
 
 XBMC_USERNAME = 'username'
 XBMC_PASSWORD = 'password'
+
+DEBUG = True

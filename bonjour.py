@@ -1,14 +1,11 @@
 import select
 import pybonjour
+from logger import logger
 
 def register_service(name, regtype, port):
     def register_callback(sdRef, flags, errorCode, name, regtype, domain):
         if errorCode == pybonjour.kDNSServiceErr_NoError:
-            print 'Registered service:'
-            print '  name    =', name
-            print '  regtype =', regtype
-            print '  domain  =', domain
-
+            logger.info('Registered bonjour service %s', name)
 
     service = pybonjour.DNSServiceRegister(name = name,
                                          regtype = regtype,
