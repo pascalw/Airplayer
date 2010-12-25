@@ -15,6 +15,7 @@ from socket import gethostname
 from xbmc import XBMC
 from web import Webserver
 import settings
+import utils
 
 import signal
 
@@ -27,6 +28,7 @@ class Runner(object):
         
     def _register_bonjour(self):
         hostname = gethostname()
+        hostname = utils.clean_hostname(hostname)
         thread.start_new_thread(bonjour.register_service, (hostname, "_airplay._tcp", self.port,))
         
     def _connect_to_xbmc(self):

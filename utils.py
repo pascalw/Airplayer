@@ -8,3 +8,6 @@ def clear_folder(folder):
                 os.unlink(file_path)
         except Exception, e:
             print e
+            
+def clean_hostname(hostname):
+    return hostname.replace('.local', '')
