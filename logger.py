@@ -10,6 +10,6 @@ logger.addHandler(handler)
 if getattr(settings, 'DEBUG', None) and settings.DEBUG:
     log_level = logging.DEBUG
 else:
-    log_level = logging.INFO    
+    log_level = logging.WARNING    
     
 logger.setLevel(log_level)    

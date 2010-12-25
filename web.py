@@ -71,8 +71,13 @@ class RateHandler(BaseHandler):
     def post(self):
         self._send_ok()
             
-        #if 'value' in self.request.arguments:           
-        #    xbmc.pause()
+        if 'value' in self.request.arguments:
+            play = bool(float(self.request.arguments['value'][0]))
+            
+            if play:
+                self._xbmc.play()
+            else:
+                self._xbmc.pause()    
 
 class PhotoHandler(BaseHandler):        
 

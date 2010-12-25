@@ -41,6 +41,28 @@ class XBMC(object):
         req = urllib2.Request(url)
         return self._http_request(req)
         
+    def _jsonrpc_api_request(self, method, *args):
+        """
+        Wrap calls to the json-rpc proxy to conveniently handle exceptions.
+        @return response, exception
+        """
+        response = None
+        exception = None
+        
+        try:    
+            response = self._jsonrpc._request(method, args)
+        except jsonrpclib.ProtocolError, e:
+            """
+            Protocol errors usually means a method could not be executed because
+            for example a seek is requested when there's no movie playing.
+            """
+            logger.info('Caught protocol error %s', e)
+            exception = e
+        except Exception, e:
+            exception = e
+            
+        return response, exception
+        
     def _send_notification(self, title, message):
         self._http_api_request('ExecBuiltIn(Notification(%s, %s))' % (title, message))
         
@@ -59,17 +81,54 @@ class XBMC(object):
 
     def notify(self):
         self._send_notification('Airplayer', 'Airplayer started')
+        
+    def get_player_state(self, player):
+        return self._jsonrpc_api_request('%s.state' % player)
+        
+    def _pause(self):
+        self._http_api_request('Pause')       
 
     def pause(self):
-        self._http_api_request('Pause')
+        response, error = self.get_player_state('videoplayer')
+        
+        if response and not response['paused']:
+            self._pause()
+    
+    def _play(self):
+        """
+        XBMC doesn't have a real play command, just play/pause.
+        This method is purely for code readability.
+        """
+        self._pause()        
+        
+    def play(self):
+        """
+        Airplay sometimes sends a play command twice and since XBMC
+        does not offer a seperate play and pause command we'll have
+        to check the current player state and choose an action
+        accordingly.
+        
+        If an error is returned there's not currently playing any
+        media, so we can send the play command.
+        
+        If there's a response and the videoplayer is currently playing
+        we can also send the play command.
+        """
+        response, error = self.get_player_state('videoplayer')
+        
+        if error or response and response['paused']:
+            self._play()
         
     def get_player_position(self):
-        response = self._jsonrpc.videoplayer.gettime()
+        #response = self._jsonrpc.videoplayer.gettime()
+        response, error = self._jsonrpc_api_request('videoplayer.gettime')
+        
+        if not error:
+            if 'time' in response:
+                return int(response['time']), int(response['total'])
 
-        if 'time' in response:
-            return int(response['time']), int(response['total'])
-        else:
-            return 0
+        return 0, 0
 
     def set_player_position(self, position):
-        self._jsonrpc.videoplayer.seektime(position)
+        #self._jsonrpc.videoplayer.seektime(position)
+        self._jsonrpc_api_request('videoplayer.seektime', position)
