@@ -37,12 +37,17 @@ Start airplayer by executing:
     
 Note
 =========
-This software is not stable by any means! It's a work in progress and not yet feature
-complete nor bug free. If you run into any problems, please don't hesitate to report it.
+This software is not stable by any means! It's about feature complete now, but still needs
+some more testing.
+
+If you run into any problems, please don't hesitate to report it.
 
 Known bugs:
 
-* Seeking through movies doesn't work properly yet. The timer on your iDevice doesn't always run
-properly and after seeking the timer doesn't run anymore at all.
-* Play/pause isn't implemented yet.
-* Seeking requires XBMC Dharma, as it uses the JSON-RPC API. Pictures are working on XBMC Camelot too.
+* When playing a movie, the timer sometimes skips a second. This is due to the fact that the
+XBMC API sometimes doesn't respond fast enough to get the current player position.
+This is purely a esthetic glitch, nothing more.
+* Airplay supports starting a movie from any position, but the XBMC API does not expose a way
+to do this. I've worked around this by just starting the movie from the beginning and then seeking
+to the specified start position. This works, but you'll probably see a split second of the beginning
+of the movie before XBMC seeks to the start position.
