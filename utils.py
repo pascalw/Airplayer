@@ -1,6 +1,9 @@
 import os
 
 def clear_folder(folder):
+    """
+    Remove the given folder's content.
+    """
     for the_file in os.listdir(folder):
         file_path = os.path.join(folder, the_file)
         try:
@@ -10,4 +13,7 @@ def clear_folder(folder):
             print e
             
 def clean_hostname(hostname):
+    """
+    Remove the .local appendix of a hostname.
+    """
     return hostname.replace('.local', '')

@@ -27,6 +27,10 @@ class Runner(object):
         self.web = None
         
     def _register_bonjour(self):
+        """
+        Register our service with bonjour.
+        gethostname() often returns <hostname>.local, remove that.
+        """
         hostname = gethostname()
         hostname = utils.clean_hostname(hostname)
         thread.start_new_thread(bonjour.register_service, (hostname, "_airplay._tcp", self.port,))
@@ -52,7 +56,7 @@ class Runner(object):
         self._register_bonjour()
         self._connect_to_xbmc()
         
-        self.xbmc.notify()
+        self.xbmc.notify_started()
         self._start_web()
     
     def receive_signal(self, signum, stack):
