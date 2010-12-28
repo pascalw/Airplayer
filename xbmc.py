@@ -51,8 +51,11 @@ class XBMC(object):
             base64string = base64.encodestring('%s:%s' % (self.username, self.password))[:-1]
             req.add_header("Authorization", "Basic %s" % base64string)
 
-
-        return urllib2.urlopen(req).read()
+        try:
+            return urllib2.urlopen(req).read()
+        except urllib2.URLError, e:
+            logger.warning("Couldn't connect to XBMC at %s, are you sure it's running?", self._host_string())
+            return None    
 
     def _http_api_request(self, command):
         """
@@ -142,7 +145,7 @@ class XBMC(object):
         """
         Notify the user that Airplayer has started.
         """
-        return self._send_notification('Airplayer', 'Airplayer started')
+        self._send_notification('Airplayer', 'Airplayer started')
     
     def get_player_state(self, player):
         """

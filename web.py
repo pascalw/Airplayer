@@ -83,6 +83,16 @@ class PhotoHandler(BaseHandler):
     def put(self):            
         if self.request.body:        
             self._xbmc.show_picture(self.request.body)
+            
+class AuthorizeHandler(BaseHandler):
+    
+    def get(self):
+        logger.debug('Got an authorize GET request')
+        logger.debug('Authorize request info: %s %s %s', self.request.headers, self.request.arguments, self.request.body)
+    
+    def post(self):
+        logger.debug('Got an authorize POST request')
+        logger.debug('Authorize request info: %s %s %s', self.request.headers, self.request.arguments, self.request.body)
     
 class StopHandler(BaseHandler):
 
@@ -103,6 +113,7 @@ class Webserver(object):
             (r'/scrub', ScrubHandler, dict(xbmc=self.xbmc)),
             (r'/rate', RateHandler, dict(xbmc=self.xbmc)),
             (r'/photo', PhotoHandler, dict(xbmc=self.xbmc)),
+            (r'/authorize', AuthorizeHandler, dict(xbmc=self.xbmc)),
             (r'/stop', StopHandler, dict(xbmc=self.xbmc)),
         ])
 
