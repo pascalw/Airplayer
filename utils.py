@@ -16,4 +16,5 @@ def clean_hostname(hostname):
     """
     Remove the .local appendix of a hostname.
     """
-    return hostname.replace('.local', '')
+    if hostname:
+        return hostname.replace('.local', '')

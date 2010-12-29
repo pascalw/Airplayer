@@ -7,9 +7,16 @@ def register_service(name, regtype, port):
         if errorCode == pybonjour.kDNSServiceErr_NoError:
             logger.info('Registered bonjour service %s', name)
 
+    record = pybonjour.TXTRecord({
+        'deviceid' : 'FF:FF:FF:FF:FF:FF',
+        'features' : '0x7',
+        'model' : 'AppleTV2,1',
+    })
+    
     service = pybonjour.DNSServiceRegister(name = name,
                                          regtype = regtype,
                                          port = port,
+                                         txtRecord = record,
                                          callBack = register_callback)
 
     try:

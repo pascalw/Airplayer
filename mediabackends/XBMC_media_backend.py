@@ -10,13 +10,12 @@ import jsonrpclib
 from logger import logger
 import utils
 
-class XBMC(object):
-        
+from base_media_backend import BaseMediaBackend
+
+class XBMCMediaBackend(BaseMediaBackend):
+    
     def __init__(self, host, port, username=None, password=None):
-        self.host = host
-        self.port = port
-        self.username = username
-        self.password = password
+        super(XBMCMediaBackend, self).__init__(host, port, username, password)
         
         self._jsonrpc = jsonrpclib.Server(self._jsonrpc_connection_string())
         
@@ -100,7 +99,7 @@ class XBMC(object):
         for i in range(3):
             response, error = self.set_player_position_percentage(position_percentage)
             if error:
-                logger.debug('Setting start position failed: %s', error.reason)
+                logger.debug('Setting start position failed: %s', error)
                 time.sleep(1)
                 continue
 
@@ -228,4 +227,4 @@ class XBMC(object):
         and accepts seeking, so we'll wait a bit before sending this command.
         This is a bit dirty, but it's the best I could come up with.
         """
-        thread.start_new_thread(self._set_start_position, (percentage_position,))        
+        thread.start_new_thread(self._set_start_position, (percentage_position,))

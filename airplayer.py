@@ -12,7 +12,6 @@ import thread
 import bonjour
 from socket import gethostname
 
-from xbmc import XBMC
 from web import Webserver
 import settings
 import utils
@@ -23,45 +22,58 @@ class Runner(object):
     
     def __init__(self, port):
         self.port = port
-        self.xbmc = None
+        self.media_backend = None
         self.web = None
         
     def _register_bonjour(self):
         """
         Register our service with bonjour.
-        gethostname() often returns <hostname>.local, remove that.
         """
-        hostname = gethostname()
-        hostname = utils.clean_hostname(hostname)
+        if getattr(settings, 'AIRPLAY_HOSTNAME', None):
+            hostname = settings.AIRPLAY_HOSTNAME
+        else:    
+            hostname = gethostname()
+            """
+            gethostname() often returns <hostname>.local, remove that.
+            """
+            hostname = utils.clean_hostname(hostname)
+            
+            if not hostname:
+                hostname = 'Airplayer'
+        
         thread.start_new_thread(bonjour.register_service, (hostname, "_airplay._tcp", self.port,))
         
-    def _connect_to_xbmc(self):
-        username = None
-        password = None
+    def _connect_to_media_backend(self):        
+        backend_module = '%s_media_backend' % settings.MEDIA_BACKEND
+        backend_class = '%sMediaBackend' % settings.MEDIA_BACKEND
+        
+        try:        
+            mod = __import__('mediabackends.%s' % backend_module, fromlist=[backend_module])
+        except ImportError:
+            raise Exception('Invalid media backend specified: %s' % settings.MEDIA_BACKEND)
+                
+        backend_cls = getattr(mod, backend_class)
+        
+        username = getattr(settings, 'MEDIA_BACKEND_USERNAME', None)
+        password = getattr(settings, 'MEDIA_BACKEND_PASSWORD', None)
 
-        if getattr(settings, 'XBMC_USERNAME', None) and settings.XBMC_USERNAME:
-            username = settings.XBMC_USERNAME
-
-        if getattr(settings, 'XBMC_PASSWORD', None) and settings.XBMC_PASSWORD:
-            password = settings.XBMC_PASSWORD
-
-        self.xbmc = XBMC(settings.XBMC_HOST, settings.XBMC_PORT, username, password)
+        self.media_backend = backend_cls(settings.MEDIA_BACKEND_HOST, settings.MEDIA_BACKEND_PORT, username, password)
         
     def _start_web(self):
         self.web = Webserver(self.port)
-        self.web.xbmc = self.xbmc
+        self.web.media_backend = self.media_backend
         self.web.start()
         
     def run(self):
         self._register_bonjour()
-        self._connect_to_xbmc()
+        self._connect_to_media_backend()
         
-        self.xbmc.notify_started()
+        self.media_backend.notify_started()
         self._start_web()
     
     def receive_signal(self, signum, stack):
         self.web.stop()
-        self.xbmc.stop_playing()
+        self.media_backend.stop_playing()
 
 def main():    
     runner = Runner(6002)
@@ -69,9 +81,8 @@ def main():
     
     try:
         runner.run()
-    except Exception, e:    
-        print 'Unable to connect to XBMC at %s' % runner.xbmc._host_string()
-        print e
+    except Exception, e:
+        print 'Error: %s' % e
         sys.exit(1)
 
 if __name__ == '__main__':
