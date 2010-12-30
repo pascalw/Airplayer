@@ -26,7 +26,10 @@ class Application(object):
     def __init__(self, port):
         self.port = port
         self.media_backend = None
-        self.web = None    
+        self.web = None
+        
+    def _setup_path(self):
+        sys.path.append(os.path.join(os.path.dirname(__file__), 'libs'))      
         
     def _configure_logging(self):
         """
@@ -91,10 +94,11 @@ class Application(object):
     def _connect_to_media_backend(self):        
         backend_module = '%s_media_backend' % settings.MEDIA_BACKEND
         backend_class = '%sMediaBackend' % settings.MEDIA_BACKEND
-        
+                
         try:        
             mod = __import__('mediabackends.%s' % backend_module, fromlist=[backend_module])
-        except ImportError:
+        except ImportError, e:
+            print e
             raise Exception('Invalid media backend specified: %s' % settings.MEDIA_BACKEND)
                 
         backend_cls = getattr(mod, backend_class)
@@ -110,6 +114,7 @@ class Application(object):
         self.web.start()
         
     def _run(self):
+        self._setup_path()
         self._configure_logging()
         self.log.info('Starting Airplayer')
         
@@ -131,7 +136,7 @@ class Application(object):
         self.web.stop()
         self.media_backend.stop_playing()
 
-def main():    
+def main():
     app = Application(6002)
     signal.signal(signal.SIGTERM, app.receive_signal)
     
