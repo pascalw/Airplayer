@@ -20,16 +20,18 @@ import bonjour
 from web import Webserver
 import settings
 import utils
+from pidfile import Pidfile
 
 class Application(object):
     
     def __init__(self, port):
+        self.pidfile = None
         self.port = port
         self.media_backend = None
         self.web = None
         
     def _setup_path(self):
-        sys.path.append(os.path.join(os.path.dirname(__file__), 'libs'))      
+        sys.path.append(os.path.join(os.path.dirname(__file__), 'libs'))  
         
     def _configure_logging(self):
         """
@@ -43,13 +45,7 @@ class Application(object):
         datefmt = r"%Y-%m-%d %H:%M:%S"
 
         if self.opts.daemon:
-            logdir = os.path.expanduser('~/.airplayer/')
-            logfile = os.path.join(logdir, 'airplayer.log')
-            
-            if not os.path.exists(logdir):
-                os.mkdir(logdir, 0755)
-            
-            handler = logging.FileHandler(logfile)
+            handler = logging.FileHandler(self.opts.logfile)
         else:
             handler = logging.StreamHandler()
 
@@ -64,6 +60,7 @@ class Application(object):
         
     def _parse_opts(self):
         parser = OptionParser(usage='usage: %prog [options] filename')
+        
         parser.add_option('-d', '--daemon', 
             action='store_true', 
             dest='daemon', 
@@ -71,8 +68,30 @@ class Application(object):
             help='run Airplayer as a daemon in the background'
         )
         
+        parser.add_option('-p', '--pidfile', 
+            action='store',
+            type='string', 
+            dest='pidfile',
+            default=None,
+            help='path for the PID file'
+        )
+        
+        parser.add_option('-l', '--logfile', 
+            action='store',
+            type='string', 
+            dest='logfile', 
+            default=None,
+            help='path for the PID file'
+        )
+        
         (self.opts, self.args) = parser.parse_args()
         
+        if self.opts.daemon:
+            if not self.opts.pidfile or not self.opts.logfile:
+                print "It's required to specify a logfile and a pidfile when running in daemon mode.\n"
+                parser.print_help()
+                sys.exit(1)
+                
     def _register_bonjour(self):
         """
         Register our service with bonjour.
@@ -108,13 +127,20 @@ class Application(object):
 
         self.media_backend = backend_cls(settings.MEDIA_BACKEND_HOST, settings.MEDIA_BACKEND_PORT, username, password)
         
+    def _init_signals(self):
+        signals = ['TERM', 'HUP', 'QUIT', 'INT']
+        
+        for signame in signals:
+            sig = getattr(signal, 'SIG%s' % signame)
+            signal.signal(sig, self.receive_signal)
+        
     def _start_web(self):
         self.web = Webserver(self.port)
         self.web.media_backend = self.media_backend
         self.web.start()
         
     def _run(self):
-        self._setup_path()
+        self._init_signals()
         self._configure_logging()
         self.log.info('Starting Airplayer')
         
@@ -126,19 +152,29 @@ class Application(object):
         
     def run(self):
         self._parse_opts()
+        self._setup_path()
                 
         if self.opts.daemon:
             utils.daemonize()
+            
+            pid = os.getpid()
+            self.pidfile = Pidfile(self.opts.pidfile)
+            self.pidfile.create(pid)
 
-        self._run()    
+        self._run()
     
-    def receive_signal(self, signum, stack):
+    def shutdown(self):
         self.web.stop()
         self.media_backend.stop_playing()
+        
+        if self.opts.daemon:
+            self.pidfile.unlink()
+    
+    def receive_signal(self, signum, stack):
+        self.shutdown()
 
 def main():
     app = Application(6002)
-    signal.signal(signal.SIGTERM, app.receive_signal)
     
     try:
         app.run()

@@ -31,14 +31,28 @@ Get going
 =========
 Now edit settings.py to reflect your own xbmc setup and you should be ready to rock!
 
-Start airplayer by executing:
+If you just want to try out airplayer, or debug problems you can run airplayer in the
+foreground by executing:
     
     python airplayer.py
     
+You can also run airplayer as a daemon (on Linux) by passing the following arguments:
+
+    python airplayer.py -d --logfile path/to/logfile --pidfile path/to/pidfile
+    
+For Ubuntu (and other Debian like systems) there's a init script included in scripts/ubuntu.
+You should edit the DAEMON, USER, GROUP and possibly PYTHON value to reflect your setup.
+Then place the file in /etc/init.d/ and make it executable (chmod +x).
+
+You can now start airplayer in the background by executing `/etc/init.d/airplayer start`.
+To make airplayer start at boot, execute:
+
+    update-rc.d airplayer defaults
+    
 Note
 =========
-This software is not stable by any means! It's about feature complete now, but still needs
-some more testing.
+This software is pre-release software. It's pretty stable now but it still needs more testing
+on different systems and different setups.
 
 If you run into any problems, please don't hesitate to report it.
 
