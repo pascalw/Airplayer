@@ -41,8 +41,9 @@ You can also run airplayer as a daemon (on Linux) by passing the following argum
     python airplayer.py -d --logfile path/to/logfile --pidfile path/to/pidfile
     
 For Ubuntu (and other Debian like systems) there's a init script included in scripts/ubuntu.
-You should edit the DAEMON, USER, GROUP and possibly PYTHON value to reflect your setup.
-Then place the file in /etc/init.d/ and make it executable (chmod +x).
+You should edit the DAEMON, USER, GROUP value to reflect your setup.
+Then place the file in /etc/init.d/ and make it executable (chmod +x). Also make sure the
+airplayer.py file itself is executable.
 
 You can now start airplayer in the background by executing `/etc/init.d/airplayer start`.
 To make airplayer start at boot, execute:

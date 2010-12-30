@@ -12,11 +12,9 @@ NAME=airplayer
 PIDFILE="/var/run/$NAME/$NAME.pid"
 LOGFILE="/var/log/$NAME/$NAME.log"
 
-PYTHON="/usr/bin/python"
-DAEMON="path/to/airplayer"
+# make sure airplayer.py is executable (chmod +x airplayer.py)
+DAEMON="path/to/airplayer.py"
 DAEMON_OPTS="-d --pidfile $PIDFILE --logfile $LOGFILE"
-
-COMMAND="$PYTHON $DAEMON"
 
 USER=xbmc
 GROUP=xbmc
@@ -31,7 +29,7 @@ case "$1" in
     start)
         echo -n "Starting $NAME: "
         start-stop-daemon --start -c $USER:$GROUP\
-                --exec $COMMAND -- $DAEMON_OPTS
+                --exec $DAEMON -- $DAEMON_OPTS
         echo $NAME
   ;;
     stop)
