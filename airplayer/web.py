@@ -130,4 +130,9 @@ class Webserver(object):
             self.media_backend.cleanup()
         
     def stop(self):
-        self.http_server.stop()      
+        try:
+            tornado.ioloop.IOLoop.instance().stop()
+            self.http_server.stop()
+        except:
+            pass    
+    

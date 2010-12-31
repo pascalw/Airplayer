@@ -44,7 +44,7 @@ class Application(object):
         fmt = r"%(asctime)s [%(levelname)s] %(message)s"
         datefmt = r"%Y-%m-%d %H:%M:%S"
 
-        if self.opts.daemon:
+        if self.opts.logfile:
             handler = logging.FileHandler(self.opts.logfile)
         else:
             handler = logging.StreamHandler()
@@ -85,6 +85,16 @@ class Application(object):
         )
         
         (self.opts, self.args) = parser.parse_args()
+        
+        file_opts = ['logfile', 'pidfile']
+        for opt in file_opts:
+            """
+            Expand user variables for all options containing a file path
+            """
+            value = getattr(self.opts, opt, None)
+            
+            if value:
+                setattr(self.opts, opt, os.path.expanduser(value))                        
         
         if self.opts.daemon:
             if not self.opts.pidfile or not self.opts.logfile:
@@ -129,10 +139,10 @@ class Application(object):
         
     def _init_signals(self):
         signals = ['TERM', 'HUP', 'QUIT', 'INT']
-        
+
         for signame in signals:
             sig = getattr(signal, 'SIG%s' % signame)
-            signal.signal(sig, self.receive_signal)
+            signal.signal(sig, self.receive_signal)    
         
     def _start_web(self):
         self.web = Webserver(self.port)
@@ -169,9 +179,9 @@ class Application(object):
         
         if self.opts.daemon:
             self.pidfile.unlink()
-    
+            
     def receive_signal(self, signum, stack):
-        self.shutdown()
+        self.shutdown()    
 
 def main():
     app = Application(6002)

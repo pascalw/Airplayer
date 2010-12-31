@@ -1,58 +1,20 @@
-Requirements
+Airplayer
 ============
-To run airplayer, you'll need:
-
-* Python (>= 2.5)
-* Pip
-* A compatible DNS-SD library (such as Avahi)
+Airplayer is a script to make media playing software Airplay-compatible.
+Airplayer features pluggable backends, making it possible to support different
+media players. Currently only XBMC is supported.  
+To create your own media backend
+see [this wikipage](https://github.com/PascalW/XBMC-Airplayer/wiki/Media-backends).
 
 Installing
 ==========
 
-A compatible DNS-SD library
----------------------------
-On OSX this is installed by default so you don't have to do anything.
-On Ubuntu you'll have to install a package, such as:
+See INSTALL
     
-    apt-get install libavahi-compat-libdnssd1
-
-On other Linux distributions you'll have to install a similar package.         
-
-Python & Pip
-------------
-You can look that up on the internet ;)
-
-When you have Python and Pip installed execute the following command:
-
-    pip install -r requirements.txt
-    
-
-Get going
-=========
-Now edit settings.py to reflect your own xbmc setup and you should be ready to rock!
-
-If you just want to try out airplayer, or debug problems you can run airplayer in the
-foreground by executing:
-    
-    python airplayer.py
-    
-You can also run airplayer as a daemon (on Linux) by passing the following arguments:
-
-    python airplayer.py -d --logfile path/to/logfile --pidfile path/to/pidfile
-    
-For Ubuntu (and other Debian like systems) there's a init script included in scripts/ubuntu.
-You should edit the DAEMON, USER, GROUP value to reflect your setup.
-Then place the file in /etc/init.d/ and make it executable (chmod +x). Also make sure the
-airplayer.py file itself is executable.
-
-You can now start airplayer in the background by executing `/etc/init.d/airplayer start`.
-To make airplayer start at boot, execute:
-
-    update-rc.d airplayer defaults
     
 Note
 =========
-This software is pre-release software. It's pretty stable now but it still needs more testing
+This is pre-release software. It's pretty stable now but it still needs more testing
 on different systems and different setups.
 
 If you run into any problems, please don't hesitate to report it.

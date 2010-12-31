@@ -1,0 +1,76 @@
+Requirements
+------------
+
+### In general
+
+To run airplayer, you'll need:
+
+* Python (>= 2.5)
+* Pip
+* A compatible DNS-SD library (such as Avahi)
+
+### Linux
+
+On Linux you'll have to install a compatible DNS-SD library.
+For Ubuntu you should install the following package:
+    
+    apt-get install libavahi-compat-libdnssd1
+
+On other Linux distributions you'll have to install a similar package.
+
+For Ubuntu (and other Debian like systems) there's a init script included in scripts/ubuntu,
+to make airplayer run as a system daemon.  
+You should edit the DAEMON, USER, GROUP value to reflect your setup.
+Then place the file in /etc/init.d/ and make it executable (chmod +x). Also make sure the
+airplayer.py file itself is executable.
+
+You can now start airplayer in the background by executing `/etc/init.d/airplayer start`.
+To make airplayer start at boot, execute:
+
+    update-rc.d airplayer defaults
+    
+### Mac OS X
+
+There are no specific requirements for Mac OS X.
+
+There's an launchd script included in scripts/macosx/ to make airplayer run in the background
+as a LaunchAgent.  
+Edit the `path/to/airplayer.py` string to match where you've put airplayer.py and
+make sure airplayer.py is executable by running `chmod +x airplayer.py`.  
+Then, place the launchd script in /Users/YOUR_USERNAME_/Library/LaunchAgents/. You can
+now start and stop airplayer by issuing the following command:
+
+    launchctl start|stop org.pwiddershoven.airplayer
+
+Airplayer will also automatically start when you login. Logs are stored in
+/Users/YOUR_USERNAME/Library/Logs/airplayer.log.
+
+### Windows
+
+For Windows you'll have to install the Bonjour SDK.  
+Get it at `http://connect.apple.com/cgi-bin/WebObjects/MemberSite.woa/wa/getSoftware?bundleID=20737`.
+(beware, login required).
+
+
+Installation
+------------
+Make sure all requirements are met (see above) and execute the following command:
+
+    pip install -r requirements.txt
+    
+This will install the required python packages airplayer depends on.
+
+Running
+-------
+
+Edit settings.py to reflect your own xbmc setup and you should be ready to rock!
+
+To run airplayer in the foreground execute:
+
+    python airplayer.py
+    
+To run airplayer in the background execute:
+
+    python airplayer.py -d --pidfile /path/to/pidfile --logfile /path/to/logfile
+    
+Or use one of the included scripts for Ubuntu or OS X (recommended).
