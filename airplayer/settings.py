@@ -1,12 +1,26 @@
 """
-Set your Media Backend. For now only XBMC is supported, but in the future
-this could also be Plex or Boxee for example.
+Set your media backend.
+Supported media backends are XBMC, Plex and Boxee.
 """
 MEDIA_BACKEND = 'XBMC'
 
+"""
+Default ports:
+XBMC: 8080
+Plex: 3000
+Boxee: 8800
+"""
 MEDIA_BACKEND_HOST = '127.0.0.1'
 MEDIA_BACKEND_PORT = 8080
 
+"""
+If your media backend doesn't require authentication,
+set this options to None.
+
+Example:
+MEDIA_BACKEND_USERNAME = None
+MEDIA_BACKEND_PASSWORD = None
+"""
 MEDIA_BACKEND_USERNAME = 'username'
 MEDIA_BACKEND_PASSWORD = 'password'
 

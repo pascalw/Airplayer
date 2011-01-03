@@ -20,6 +20,23 @@ def clean_hostname(hostname):
     if hostname:
         return hostname.replace('.local', '')
         
+def duration_to_seconds(duration_str):
+    """
+    Acceptable formats are: "MM:SS", "HH:MM" and "HH:MM:SS".
+    """
+    values = duration_str.split(':')
+    
+    if len(values) == 1:
+        raise Exception('Invalid value supplied: %s', duration_str)
+    
+    seconds = 0
+    
+    for i, val in enumerate(reversed(values)):        
+        val = int(val) * pow(60, i)
+        seconds = seconds + val
+        
+    return seconds        
+        
 """
 The following code is originating from Gunicorn:
 https://github.com/benoitc/gunicorn
@@ -64,4 +81,4 @@ def daemonize():
 
     os.open(REDIRECT_TO, os.O_RDWR)
     os.dup2(0, 1)
-    os.dup2(0, 2)        
+    os.dup2(0, 2)    

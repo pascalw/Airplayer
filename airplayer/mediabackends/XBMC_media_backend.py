@@ -13,6 +13,14 @@ import utils
 from base_media_backend import BaseMediaBackend
 
 class XBMCMediaBackend(BaseMediaBackend):
+    """
+    The XBMC media backend uses a hybride Web_Server_HTTP_API / JSON-RPC API approach,
+    since the Web_Server_HTTP_API is deprecated from XBMC Dharma (current stable).
+    
+    However, not all required methods are exposed through the JSON-RPC API, so in that
+    cases the old HTTP API is used. In the future when the JSON-RPC is extended to expose
+    all required methods, the HTTP API will not be used anymore.
+    """
     
     def __init__(self, host, port, username=None, password=None):
         super(XBMCMediaBackend, self).__init__(host, port, username, password)
@@ -199,7 +207,7 @@ class XBMCMediaBackend(BaseMediaBackend):
     def get_player_position(self):
         """
         Get the current videoplayer positon.
-        @returns dictionary, exception
+        @returns int, int
         """
         response, error = self._jsonrpc_api_request('videoplayer.gettime')
         
@@ -212,13 +220,16 @@ class XBMCMediaBackend(BaseMediaBackend):
     def set_player_position(self, position):
         """
         Set the current videoplayer position.
-        @param position integer
+        
+        @param position integer in seconds
         """
         self._jsonrpc_api_request('videoplayer.seektime', position)
         
     def set_player_position_percentage(self, percentage_position):
         """
         Set current videoplayer position, in percentage.
+        
+        @param percentage_position float
         """
         return self._jsonrpc_api_request('videoplayer.seekpercentage', percentage_position)
         
@@ -227,5 +238,7 @@ class XBMCMediaBackend(BaseMediaBackend):
         It can take a few seconds before XBMC starts playing the movie
         and accepts seeking, so we'll wait a bit before sending this command.
         This is a bit dirty, but it's the best I could come up with.
+        
+        @param percentage_position float
         """
         thread.start_new_thread(self._set_start_position, (percentage_position,))

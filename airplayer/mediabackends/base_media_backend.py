@@ -59,18 +59,23 @@ class BaseMediaBackend(object):
     def set_player_position(self, position):
         """
         Set the current videoplayer position.
-        @param position integer
+        
+        @param position integer in seconds
         """
         raise NotImplementedError
         
     def set_player_position_percentage(self, percentage_position):
         """
         Set current videoplayer position, in percentage.
+        
+        @param percentage_position float
         """
         raise NotImplementedError
         
     def set_start_position(self, percentage_position):
         """
         Play media from the given location
+        
+        @param percentage_position float
         """
         raise NotImplementedError

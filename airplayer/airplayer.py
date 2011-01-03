@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-untitled.py
+airplayer.py
 
 Created by Pascal Widdershoven on 2010-12-19.
 Copyright (c) 2010 P. Widdershoven. All rights reserved.
@@ -189,7 +189,7 @@ def main():
     try:
         app.run()
     except Exception, e:
-        print 'Error: %s' % e
+        raise e
         sys.exit(1)
 
 if __name__ == '__main__':
