@@ -1,11 +1,9 @@
 import urllib2
 import urllib
-import base64
 import time
 import thread
 import tempfile
 import shutil
-import logging
 
 import libs.jsonrpclib as jsonrpclib
 import utils
@@ -28,7 +26,6 @@ class XBMCMediaBackend(BaseMediaBackend):
         self._jsonrpc = jsonrpclib.Server(self._jsonrpc_connection_string())
         self._TMP_DIR = tempfile.mkdtemp()
         
-        self.log = logging.getLogger('airplayer')
         self.log.debug('TEMP DIR: %s', self._TMP_DIR)
     
     def _jsonrpc_connection_string(self):
@@ -42,28 +39,6 @@ class XBMCMediaBackend(BaseMediaBackend):
             host_string = '%s:%s@%s' % (self.username, self.password, host_string)
             
         return 'http://%s/jsonrpc' % host_string    
-        
-    def _host_string(self):
-        """
-        Convenience method, get a string with the current host and port.
-        @return <host>:<port>
-        """
-        return '%s:%d' % (self.host, self.port)
-        
-    def _http_request(self, req):
-        """
-        Perform a http request andapply HTTP Basic authentication headers,
-        if an username and password are supplied in settings.
-        """
-        if self.username and self.password:
-            base64string = base64.encodestring('%s:%s' % (self.username, self.password))[:-1]
-            req.add_header("Authorization", "Basic %s" % base64string)
-
-        try:
-            return urllib2.urlopen(req).read()
-        except urllib2.URLError, e:
-            self.log.warning("Couldn't connect to XBMC at %s, are you sure it's running?", self._host_string())
-            return None    
 
     def _http_api_request(self, command):
         """
@@ -207,7 +182,7 @@ class XBMCMediaBackend(BaseMediaBackend):
     def get_player_position(self):
         """
         Get the current videoplayer positon.
-        @returns int, int
+        @returns int current position, int total length
         """
         response, error = self._jsonrpc_api_request('videoplayer.gettime')
         

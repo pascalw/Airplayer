@@ -157,7 +157,7 @@ class PlexMediaBackend(XBMCMediaBackend):
     def get_player_position(self):
         """
         Get the current videoplayer positon.
-        @returns int, int
+        @returns int current position, int total length
         """
         response = self.get_player_state()
         
