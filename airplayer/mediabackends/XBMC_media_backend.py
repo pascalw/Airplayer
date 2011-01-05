@@ -4,6 +4,7 @@ import time
 import thread
 import tempfile
 import shutil
+import os
 
 import libs.jsonrpclib as jsonrpclib
 import utils
@@ -110,9 +111,13 @@ class XBMCMediaBackend(BaseMediaBackend):
         to crash XBMC?
         """
         utils.clear_folder(self._TMP_DIR)
-        path = '%s/picture%d.jpg' % (self._TMP_DIR, int(time.time()))
-
-        f = open(path, 'w')
+        filename = 'picture%d.jpg' % int(time.time())
+        path = os.path.join(self._TMP_DIR, filename)
+        
+        """
+        write mode 'b' is needed for Windows compatibility, since we're writing a binary file here.
+        """
+        f = open(path, 'wb')
         f.write(data)
         f.close()
             
