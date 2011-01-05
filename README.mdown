@@ -6,6 +6,13 @@ media players. Currently XBMC, Boxee and Plex are supported.
 To create your own media backend
 see [this wikipage](https://github.com/PascalW/XBMC-Airplayer/wiki/Media-backends).
 
+Features
+========
+Send video and pictures from your iDevice to your Airplay enabled media player. Audio
+streaming is currently not supported.
+
+On the iDevice side IOS 4.2 or above is required.
+
 Installing
 ==========
 
@@ -28,3 +35,4 @@ This is purely a esthetic glitch, nothing more.
 to do this. I've worked around this by just starting the movie from the beginning and then seeking
 to the specified start position. This works, but you'll probably see a split second of the beginning
 of the movie before XBMC seeks to the start position.
+* It's not possible to stream DRM protocted content (yet).
