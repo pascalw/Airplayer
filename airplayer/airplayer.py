@@ -6,7 +6,6 @@ airplayer.py
 Created by Pascal Widdershoven on 2010-12-19.
 Copyright (c) 2010 P. Widdershoven. All rights reserved.
 """
-from __future__ import with_statement
 
 import sys
 import thread
@@ -141,8 +140,14 @@ class Application(object):
         signals = ['TERM', 'HUP', 'QUIT', 'INT']
 
         for signame in signals:
-            sig = getattr(signal, 'SIG%s' % signame)
-            signal.signal(sig, self.receive_signal)    
+            """
+            SIGHUP and SIGQUIT are not available on Windows, so just don't register a handler for them
+            if they don't exist.
+            """
+            sig = getattr(signal, 'SIG%s' % signame, None)
+            
+            if sig:
+                signal.signal(sig, self.receive_signal)    
         
     def _start_web(self):
         self.web = Webserver(self.port)
