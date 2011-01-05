@@ -1,5 +1,12 @@
 import os
-import resource
+import platform
+try:
+    import resource
+except ImportError:
+    """
+    Not available on Windows
+    """
+    pass    
 
 def clear_folder(folder):
     """
@@ -55,10 +62,11 @@ def get_maxfd():
     return maxfd
             
 def daemonize():
-    """\
-    Standard daemonization of a process.
-    http://www.svbug.com/documentation/comp.unix.programmer-FAQ/faq_2.html#SEC16
     """
+    Currently only implemented for Unix like systems.
+    """
+    if platform.system() == 'Windows':
+        raise Exception('Daemonizing is currently not supported on Windows.')
        
     if os.fork() == 0: 
         os.setsid()
