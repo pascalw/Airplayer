@@ -1,15 +1,17 @@
-Requirements
-------------
-
-### In general
+General requirements
+====================
 
 To run airplayer, you'll need:
 
 * Python (>= 2.5)
 * Pip
-* A compatible DNS-SD library (such as Avahi)
+* A compatible DNS-SD library (such as Avahi), on OSX this is installed by default
 
-### Linux
+Platform specific requirements
+==============================
+
+Linux
+-----
 
 On Linux you'll have to install a compatible DNS-SD library.
 For Ubuntu you should install the following package:
@@ -17,6 +19,50 @@ For Ubuntu you should install the following package:
     apt-get install libavahi-compat-libdnssd1
 
 On other Linux distributions you'll have to install a similar package.
+    
+Mac OS X
+--------
+
+There are no specific requirements for Mac OS X.
+
+Windows
+-------
+
+For Windows you'll have to install the Bonjour SDK.  
+Get it at `http://connect.apple.com/cgi-bin/WebObjects/MemberSite.woa/wa/getSoftware?bundleID=20737`.
+(beware, login required).
+
+Installation
+============
+Make sure all requirements are met (see above) and execute the following command:
+
+    pip install -r requirements.txt
+    
+This will install the required python packages airplayer depends on.
+
+Running
+=======
+
+Edit settings.py to reflect your setup. For help, read the comments in settings.py.
+
+Airplayer can be run in the foreground in your terminal and in the background as a system daemon (on Linux and OS X).
+It is advised to first try to run airplayer in your terminal before trying to run it in the background,
+as it will be easier to spot (configuration) issues when running in the foreground.
+
+Foreground
+----------
+
+To run airplayer in the foreground execute:
+
+    python airplayer.py
+    
+Background
+----------
+
+There are scripts included to make Airplayer run in the background on Ubuntu and Mac OS X.
+By installing this scripts, Airplayer will also start when your computer boots.
+
+### Ubuntu
 
 For Ubuntu (and other Debian like systems) there's a init script included in scripts/ubuntu,
 to make airplayer run as a system daemon.  
@@ -30,8 +76,6 @@ To make airplayer start at boot, execute:
     update-rc.d airplayer defaults
     
 ### Mac OS X
-
-There are no specific requirements for Mac OS X.
 
 There's an launchd script included in scripts/macosx/ to make airplayer run in the background
 as a LaunchAgent.  
@@ -47,30 +91,6 @@ Airplayer will also automatically start when you login. Logs are stored in
 
 ### Windows
 
-For Windows you'll have to install the Bonjour SDK.  
-Get it at `http://connect.apple.com/cgi-bin/WebObjects/MemberSite.woa/wa/getSoftware?bundleID=20737`.
-(beware, login required).
-
-
-Installation
-------------
-Make sure all requirements are met (see above) and execute the following command:
-
-    pip install -r requirements.txt
-    
-This will install the required python packages airplayer depends on.
-
-Running
--------
-
-Edit settings.py to reflect your own xbmc setup and you should be ready to rock!
-
-To run airplayer in the foreground execute:
-
-    python airplayer.py
-    
-To run airplayer in the background execute:
-
-    python airplayer.py -d --pidfile /path/to/pidfile --logfile /path/to/logfile
-    
-Or use one of the included scripts for Ubuntu or OS X (recommended).
+This feauture is currently not supported on Windows. I'm not a Windows user myself, so I have no idea
+what's required to make a python script run as a Windows Service or something. If someone is interested
+in tinkering with this and writing some instructions, let me know.
