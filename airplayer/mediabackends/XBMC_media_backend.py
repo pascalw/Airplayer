@@ -24,6 +24,7 @@ class XBMCMediaBackend(BaseMediaBackend):
     def __init__(self, host, port, username=None, password=None):
         super(XBMCMediaBackend, self).__init__(host, port, username, password)
         
+        self._last_wakeup = None
         self._jsonrpc = jsonrpclib.Server(self._jsonrpc_connection_string())
         self._TMP_DIR = tempfile.mkdtemp()
         
@@ -44,8 +45,10 @@ class XBMCMediaBackend(BaseMediaBackend):
     def _http_api_request(self, command):
         """
         Perform a request to the XBMC http api.
-        Warning, the caller is reponsible for error handling!
+        @return raw request result or None in case of error
         """
+        self._wake_screen()
+        
         command = urllib.quote(command)
         url = 'http://%s/xbmcCmds/xbmcHttp?command=%s' % (self._host_string(), command)
 
@@ -60,7 +63,8 @@ class XBMCMediaBackend(BaseMediaBackend):
         response = None
         exception = None
         
-        try:    
+        try:
+            self._wake_screen()    
             response = self._jsonrpc._request(method, args)
         except jsonrpclib.ProtocolError, e:
             """
@@ -93,6 +97,24 @@ class XBMCMediaBackend(BaseMediaBackend):
 
         self.log.warning('Failed to set start position')
         
+    def _wake_screen(self):
+        """
+        XBMC doesn't seem to wake the screen when the screen is dimmed and a slideshow is started.
+        See http://trac.xbmc.org/ticket/10883.
+        
+        There isn't a real method to wake the screen, so we'll just send a bogus request which does
+        nothing, but does wake up the screen.
+        
+        For performance concerns, we only send this request once every minute.
+        """
+        last_wakeup = self._last_wakeup
+        now = time.time()
+        self._last_wakeup = now
+        
+        if not last_wakeup or now - last_wakeup > 60:
+            self.log.debug('Sending wake event')
+            self._http_api_request('sendkey(ACTION_NONE)')
+        
     def cleanup(self):
         shutil.rmtree(self._TMP_DIR)                          
         
@@ -120,7 +142,7 @@ class XBMCMediaBackend(BaseMediaBackend):
         f = open(path, 'wb')
         f.write(data)
         f.close()
-            
+        
         self._http_api_request('PlaySlideshow(%s)' % self._TMP_DIR)
         
     def play_movie(self, url):
