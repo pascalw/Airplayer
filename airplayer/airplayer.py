@@ -35,8 +35,7 @@ class Application(object):
     def _configure_logging(self):
         """
         Configure logging.
-        When not running in the background we just log to stdout,
-        otherwise we'll log to a logfile in the parent diretory.
+        When no logfile argument is given we log to stdout.
         """
         self.log = logging.getLogger('airplayer')
 
@@ -119,7 +118,13 @@ class Application(object):
         
         thread.start_new_thread(bonjour.register_service, (hostname, "_airplay._tcp", self.port,))
         
-    def _connect_to_media_backend(self):        
+    def _connect_to_media_backend(self):
+        """
+        Backends follow the following naming convention:
+        
+        Backend module should be named <backend_name>_media_backend and should contain
+        a class named <backend_name>MediaBackend which inherits from the BaseMediaBackend.
+        """        
         backend_module = '%s_media_backend' % settings.MEDIA_BACKEND
         backend_class = '%sMediaBackend' % settings.MEDIA_BACKEND
                 
@@ -137,6 +142,9 @@ class Application(object):
         self.media_backend = backend_cls(settings.MEDIA_BACKEND_HOST, settings.MEDIA_BACKEND_PORT, username, password)
         
     def _init_signals(self):
+        """
+        Setup kill signal handlers.
+        """
         signals = ['TERM', 'HUP', 'QUIT', 'INT']
 
         for signame in signals:
@@ -150,22 +158,18 @@ class Application(object):
                 signal.signal(sig, self.receive_signal)    
         
     def _start_web(self):
+        """
+        Start the webserver and connect our media backend.
+        """
         self.web = Webserver(self.port)
         self.web.media_backend = self.media_backend
         self.web.start()
-        
-    def _run(self):
-        self._init_signals()
-        self._configure_logging()
-        self.log.info('Starting Airplayer')
-        
-        self._register_bonjour()
-        self._connect_to_media_backend()
-        
-        self.media_backend.notify_started()
-        self._start_web()
-        
+                
     def run(self):
+        """
+        Run the application.
+        Perform some bootstrapping, fork/daemonize if necessary.
+        """
         self._parse_opts()
         self._setup_path()
                 
@@ -176,9 +180,22 @@ class Application(object):
             self.pidfile = Pidfile(self.opts.pidfile)
             self.pidfile.create(pid)
 
-        self._run()
+        self._init_signals()
+        self._configure_logging()
+        self.log.info('Starting Airplayer')
+
+        self._register_bonjour()
+        self._connect_to_media_backend()
+
+        self.media_backend.notify_started()
+        self._start_web()
     
     def shutdown(self):
+        """
+        Called on application shutdown.
+        
+        Stop the webserver and stop the media backend.
+        """
         self.web.stop()
         self.media_backend.stop_playing()
         

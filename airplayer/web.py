@@ -8,6 +8,11 @@ from tornado.httputil import HTTPHeaders
 log = logging.getLogger('airplayer')
 
 class BaseHandler(tornado.web.RequestHandler):
+    """
+    Base request handler, all other handler should inherit from this class.
+    
+    Provides some logging and media backend assignment.
+    """
 
     def initialize(self, media_backend):
         self._media_backend = media_backend  
@@ -17,6 +22,8 @@ class BaseHandler(tornado.web.RequestHandler):
 
 class ReverseHandler(BaseHandler):
     """
+    Handler for /reverse requests.
+    
     The reverse command is the first command sent by Airplay,
     it's a handshake.
     """
@@ -27,50 +34,98 @@ class ReverseHandler(BaseHandler):
         self.set_header('Connection', 'Upgrade')
     
 class PlayHandler(BaseHandler):
+    """
+    Handler for /play requests.
+    
+    Contains a header like format in the request body which should contain a
+    Content-Location and optionally a Start-Position.
+    """
 
     @tornado.web.asynchronous
     def post(self):
+        """
+        Immediately finish this request, no need for the client to wait for
+        backend communication.
+        """
         self.finish()
         
-        body = self.request.body
-        info = HTTPHeaders.parse(body)
+        body = HTTPHeaders.parse(self.request.body)
         
-        if 'Content-Location' in info:
-            self._media_backend.play_movie(info['Content-Location'])
+        if 'Content-Location' in body:
+            self._media_backend.play_movie(body['Content-Location'])
             
-            if 'Start-Position' in info:
+            if 'Start-Position' in body:
                 """ 
                 Airplay sends start-position in percentage from 0 to 1.
-                XBMC expects a percentage from 0 to 100.
+                Media backends expect a percentage from 0 to 100.
                 """
-                position_percentage = float(info['Start-Position']) * 100
-                self._media_backend.set_start_position(position_percentage)
+                try:
+                    str_pos = body['Start-Position']
+                except ValueError:
+                    log.warning('Invalid start-position supplied: ', str_pos)
+                else:        
+                    position_percentage = float(str_pos) * 100
+                    self._media_backend.set_start_position(position_percentage)
                             
 
-class ScrubHandler(BaseHandler):        
+class ScrubHandler(BaseHandler):
+    """
+    Handler for /scrub requests.
+    
+    Used to perform seeking (POST request) and to retrieve current player position (GET request).
+    """       
 
-    @tornado.web.asynchronous
     def get(self):
+        """
+        Will return None, None if no media is playing or an error occures.
+        """
         position, duration = self._media_backend.get_player_position()
         
+        """
+        Should None values be returned just default to 0 values.
+        """
         if not position:
             duration = position = 0
             
         body = 'duration: %f\r\nposition: %f\r\n' % (duration, position)
-        
         self.write(body)
+    
+    @tornado.web.asynchronous
+    def post(self):
+        """
+        Immediately finish this request, no need for the client to wait for
+        backend communication.
+        """
         self.finish()
- 
-    def post(self):    
+        
         if 'position' in self.request.arguments:
-            self._media_backend.set_player_position(int(float(self.request.arguments['position'][0])))
+            try:
+                str_pos = self.request.arguments['position'][0]
+                position = int(float(str_pos))
+            except ValueError:
+                log.warn('Invalid scrub value supplied: ', str_pos)
+            else:       
+                self._media_backend.set_player_position(position)
     
 class RateHandler(BaseHandler):    
     """
+    Handler for /rate requests.
+    
     The rate command is used to play/pause media.
+    A value argument should be supplied which indicates media should be played or paused.
+    
+    0.000000 => pause
+    1.000000 => play
     """
-
-    def post(self):            
+    
+    @tornado.web.asynchronous
+    def post(self): 
+        """
+        Immediately finish this request, no need for the client to wait for
+        backend communication.
+        """
+        self.finish()
+                   
         if 'value' in self.request.arguments:
             play = bool(float(self.request.arguments['value'][0]))
             
@@ -79,23 +134,49 @@ class RateHandler(BaseHandler):
             else:
                 self._media_backend.pause()    
 
-class PhotoHandler(BaseHandler):        
+class PhotoHandler(BaseHandler):   
+    """
+    Handler for /photo requests.
+    
+    RAW JPEG data is contained in the request body.
+    """     
 
-    def put(self):            
+    @tornado.web.asynchronous
+    def put(self):           
+        """
+        Immediately finish this request, no need for the client to wait for
+        backend communication.
+        """
+        self.finish()
+         
         if self.request.body:        
             self._media_backend.show_picture(self.request.body)
             
 class AuthorizeHandler(BaseHandler):
+    """
+    Handler for /authorize requests.
     
+    This is used to handle DRM authorization.
+    We currently don't support DRM protected media.
+    """
+    
+    def prepare(self):
+        log.warning('Trying to play DRM protected, this is currently unsupported.')
+        log.debug('Got an authorize %s request', self.request.method)
+        log.debug('Authorize request info: %s %s %s', self.request.headers, self.request.arguments, self.request.body)
+        
     def get(self):
-        log.debug('Got an authorize GET request')
-        log.debug('Authorize request info: %s %s %s', self.request.headers, self.request.arguments, self.request.body)
-    
+        pass
+        
     def post(self):
-        log.debug('Got an authorize POST request')
-        log.debug('Authorize request info: %s %s %s', self.request.headers, self.request.arguments, self.request.body)
+        pass    
     
 class StopHandler(BaseHandler):
+    """
+    Handler for /stop requests.
+    
+    Sent when media playback should be stopped.
+    """
 
     def post(self):
         self._media_backend.stop_playing()

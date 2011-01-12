@@ -6,7 +6,7 @@ import tempfile
 import shutil
 import os
 
-import libs.jsonrpclib as jsonrpclib
+import lib.jsonrpclib as jsonrpclib
 import utils
 
 from base_media_backend import BaseMediaBackend
