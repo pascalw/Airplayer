@@ -16,7 +16,7 @@ import logging
 import os
 
 import bonjour
-from web import Webserver
+from protocol_handler import AirplayProtocolHandler
 import settings
 import utils
 from pidfile import Pidfile
@@ -24,13 +24,17 @@ from pidfile import Pidfile
 class Application(object):
     
     def __init__(self, port):
-        self.pidfile = None
-        self.port = port
-        self.media_backend = None
-        self.web = None
+        self._port = port
+        self._pidfile = None
+        self._media_backend = None
+        self._protocol_handler = None
+        self._opts = None
+        self._args = None
+        
+        self.log = None
         
     def _setup_path(self):
-        sys.path.append(os.path.join(os.path.dirname(__file__), 'libs'))  
+        sys.path.append(os.path.join(os.path.dirname(__file__), 'lib'))  
         
     def _configure_logging(self):
         """
@@ -42,8 +46,8 @@ class Application(object):
         fmt = r"%(asctime)s [%(levelname)s] %(message)s"
         datefmt = r"%Y-%m-%d %H:%M:%S"
 
-        if self.opts.logfile:
-            handler = logging.FileHandler(self.opts.logfile)
+        if self._opts.logfile:
+            handler = logging.FileHandler(self._opts.logfile)
         else:
             handler = logging.StreamHandler()
 
@@ -82,20 +86,20 @@ class Application(object):
             help='path for the PID file'
         )
         
-        (self.opts, self.args) = parser.parse_args()
+        (self._opts, self._args) = parser.parse_args()
         
         file_opts = ['logfile', 'pidfile']
         for opt in file_opts:
             """
             Expand user variables for all options containing a file path
             """
-            value = getattr(self.opts, opt, None)
+            value = getattr(self._opts, opt, None)
             
             if value:
-                setattr(self.opts, opt, os.path.expanduser(value))                        
+                setattr(self._opts, opt, os.path.expanduser(value))                        
         
-        if self.opts.daemon:
-            if not self.opts.pidfile or not self.opts.logfile:
+        if self._opts.daemon:
+            if not self._opts.pidfile or not self._opts.logfile:
                 print "It's required to specify a logfile and a pidfile when running in daemon mode.\n"
                 parser.print_help()
                 sys.exit(1)
@@ -116,9 +120,9 @@ class Application(object):
             if not hostname:
                 hostname = 'Airplayer'
         
-        thread.start_new_thread(bonjour.register_service, (hostname, "_airplay._tcp", self.port,))
+        thread.start_new_thread(bonjour.register_service, (hostname, "_airplay._tcp", self._port,))
         
-    def _connect_to_media_backend(self):
+    def _register_media_backend(self):
         """
         Backends follow the following naming convention:
         
@@ -139,7 +143,7 @@ class Application(object):
         username = getattr(settings, 'MEDIA_BACKEND_USERNAME', None)
         password = getattr(settings, 'MEDIA_BACKEND_PASSWORD', None)
 
-        self.media_backend = backend_cls(settings.MEDIA_BACKEND_HOST, settings.MEDIA_BACKEND_PORT, username, password)
+        self._media_backend = backend_cls(settings.MEDIA_BACKEND_HOST, settings.MEDIA_BACKEND_PORT, username, password)
         
     def _init_signals(self):
         """
@@ -157,13 +161,12 @@ class Application(object):
             if sig:
                 signal.signal(sig, self.receive_signal)    
         
-    def _start_web(self):
+    def _start_protocol_handler(self):
         """
         Start the webserver and connect our media backend.
         """
-        self.web = Webserver(self.port)
-        self.web.media_backend = self.media_backend
-        self.web.start()
+        self._protocol_handler = AirplayProtocolHandler(self._port, self._media_backend)
+        self._protocol_handler.start()
                 
     def run(self):
         """
@@ -173,22 +176,22 @@ class Application(object):
         self._parse_opts()
         self._setup_path()
                 
-        if self.opts.daemon:
+        if self._opts.daemon:
             utils.daemonize()
             
             pid = os.getpid()
-            self.pidfile = Pidfile(self.opts.pidfile)
-            self.pidfile.create(pid)
+            self._pidfile = Pidfile(self._opts.pidfile)
+            self._pidfile.create(pid)
 
         self._init_signals()
         self._configure_logging()
         self.log.info('Starting Airplayer')
 
         self._register_bonjour()
-        self._connect_to_media_backend()
+        self._register_media_backend()
 
-        self.media_backend.notify_started()
-        self._start_web()
+        self._media_backend.notify_started()
+        self._start_protocol_handler()
     
     def shutdown(self):
         """
@@ -196,11 +199,11 @@ class Application(object):
         
         Stop the webserver and stop the media backend.
         """
-        self.web.stop()
-        self.media_backend.stop_playing()
+        self._protocol_handler.stop()
+        self._media_backend.stop_playing()
         
-        if self.opts.daemon:
-            self.pidfile.unlink()
+        if self._opts.daemon:
+            self._pidfile.unlink()
             
     def receive_signal(self, signum, stack):
         self.shutdown()    

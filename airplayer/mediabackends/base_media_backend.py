@@ -5,27 +5,20 @@ import urllib2
 class BaseMediaBackend(object):
     
     def __init__(self, host, port, username=None, password=None):
-        self.host = host
-        self.port = port
-        self.username = username
-        self.password = password
+        self._host = host
+        self._port = port
+        self._username = username
+        self._password = password
         
         self.log = logging.getLogger('airplayer')
-        
-    def _host_string(self):
-        """
-        Convenience method, get a string with the current host and port.
-        @return <host>:<port>
-        """
-        return '%s:%d' % (self.host, self.port)
         
     def _http_request(self, req):
         """
         Perform a http request andapply HTTP Basic authentication headers,
         if an username and password are supplied in settings.
         """
-        if self.username and self.password:
-            base64string = base64.encodestring('%s:%s' % (self.username, self.password))[:-1]
+        if self._username and self._password:
+            base64string = base64.encodestring('%s:%s' % (self._username, self._password))[:-1]
             req.add_header("Authorization", "Basic %s" % base64string)
 
         try:
@@ -34,8 +27,15 @@ class BaseMediaBackend(object):
             clsname = self.__class__.__name__
             name = clsname.replace('MediaBackend', '')
             
-            self.log.warning("Couldn't connect to %s at %s, are you sure it's running?", name, self._host_string())
-            return None      
+            self.log.warning("Couldn't connect to %s at %s, are you sure it's running?", name, self.host_string())
+            return None
+    
+    def host_string(self):
+        """
+        Convenience method, get a string with the current host and port.
+        @return <host>:<port>
+        """
+        return '%s:%d' % (self._host, self._port)        
                 
     def cleanup(self):
         """

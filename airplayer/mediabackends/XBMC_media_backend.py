@@ -31,14 +31,14 @@ class XBMCMediaBackend(BaseMediaBackend):
         self.log.debug('TEMP DIR: %s', self._TMP_DIR)
     
     def _jsonrpc_connection_string(self):
-        host_string = self._host_string()
+        host_string = self.host_string()
         
-        if self.username and self.password:
+        if self._username and self._password:
             """
             Unfortunately there's no other way to provide authentication credentials
             to jsonrpclib but in the url.
             """
-            host_string = '%s:%s@%s' % (self.username, self.password, host_string)
+            host_string = '%s:%s@%s' % (self._username, self._password, host_string)
             
         return 'http://%s/jsonrpc' % host_string    
 
@@ -50,7 +50,7 @@ class XBMCMediaBackend(BaseMediaBackend):
         self._wake_screen()
         
         command = urllib.quote(command)
-        url = 'http://%s/xbmcCmds/xbmcHttp?command=%s' % (self._host_string(), command)
+        url = 'http://%s/xbmcCmds/xbmcHttp?command=%s' % (self.host_string(), command)
 
         req = urllib2.Request(url)
         return self._http_request(req)
