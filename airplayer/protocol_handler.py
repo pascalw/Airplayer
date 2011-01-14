@@ -1,4 +1,5 @@
 import logging
+import appletv
 
 import tornado.httpserver
 import tornado.ioloop
@@ -14,18 +15,21 @@ class AirplayProtocolHandler(object):
         self._media_backend = media_backend
         self._port = port
     
-    def start(self):        
-        application = tornado.web.Application([
-            (r'/reverse', AirplayProtocolHandler.ReverseHandler, dict(media_backend=self._media_backend)),
-            (r'/play', AirplayProtocolHandler.PlayHandler, dict(media_backend=self._media_backend)),
-            (r'/scrub', AirplayProtocolHandler.ScrubHandler, dict(media_backend=self._media_backend)),
-            (r'/rate', AirplayProtocolHandler.RateHandler, dict(media_backend=self._media_backend)),
-            (r'/photo', AirplayProtocolHandler.PhotoHandler, dict(media_backend=self._media_backend)),
-            (r'/authorize', AirplayProtocolHandler.AuthorizeHandler, dict(media_backend=self._media_backend)),
-            (r'/server-info', AirplayProtocolHandler.ServerInfoHandler, dict(media_backend=self._media_backend)),
-            (r'/slideshow-features', AirplayProtocolHandler.SlideshowFeaturesHandler, dict(media_backend=self._media_backend)),
-            (r'/stop', AirplayProtocolHandler.StopHandler, dict(media_backend=self._media_backend)),
-        ])
+    def start(self):
+        handlers = {
+            '/reverse' : AirplayProtocolHandler.ReverseHandler,
+            '/play' : AirplayProtocolHandler.PlayHandler,
+            '/scrub' : AirplayProtocolHandler.ScrubHandler,
+            '/rate' : AirplayProtocolHandler.RateHandler,
+            '/photo' : AirplayProtocolHandler.PhotoHandler,
+            '/authorize' : AirplayProtocolHandler.AuthorizeHandler,
+            '/server-info' : AirplayProtocolHandler.ServerInfoHandler,
+            '/playback-info' : AirplayProtocolHandler.PlaybackInfoHandler,
+            '/stop' : AirplayProtocolHandler.StopHandler,
+        }
+        
+        app_handlers = [(url, handlers[url], dict(media_backend=self._media_backend)) for url in handlers.keys()] 
+        application = tornado.web.Application(app_handlers)
 
         self._http_server = tornado.httpserver.HTTPServer(application)
         self._http_server.listen(self._port)
@@ -231,7 +235,7 @@ class AirplayProtocolHandler(object):
         """        
         
         def get(self):
-            pass        
+            self.write(appletv.SERVER_INFO)
             
     class SlideshowFeaturesHandler(BaseHandler):
         """
@@ -241,5 +245,13 @@ class AirplayProtocolHandler(object):
         Available from IOS 4.3.
         """        
 
+        def get(self):
+            self.write(appletv.SLIDESHOW_FEATURES)
+            
+    class PlaybackInfoHandler(BaseHandler):
+        """
+        Handler for /playback-info requests.
+        """
+        
         def get(self):
             pass
