@@ -81,7 +81,12 @@ There's an launchd script included in scripts/macosx/ to make airplayer run in t
 as a LaunchAgent.  
 Edit the `path/to/airplayer.py` string to match where you've put airplayer.py and
 make sure airplayer.py is executable by running `chmod +x airplayer.py`.  
-Then, place the launchd script in /Users/YOUR_USERNAME_/Library/LaunchAgents/. You can
+Then, place the launchd script in /Users/YOUR_USERNAME_/Library/LaunchAgents/.
+Now activate the launch daemon by executing:
+
+    launchctl load -w /Users/YOUR_USERNAME_/Library/LaunchAgents/org.pwiddershoven.airplayer.plist
+
+You can
 now start and stop airplayer by issuing the following command:
 
     launchctl start|stop org.pwiddershoven.airplayer
