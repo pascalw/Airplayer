@@ -156,6 +156,14 @@ class XBMCMediaBackend(BaseMediaBackend):
         Notify the user that Airplayer has started.
         """
         self._send_notification('Airplayer', 'Airplayer started')
+        
+    def is_playing(self):
+        response, error = self.get_player_state('videoplayer')
+        
+        if error:
+            return False
+            
+        return not response['paused']
     
     def get_player_state(self, player):
         """

@@ -24,6 +24,7 @@ class AirplayProtocolHandler(object):
             '/photo' : AirplayProtocolHandler.PhotoHandler,
             '/authorize' : AirplayProtocolHandler.AuthorizeHandler,
             '/server-info' : AirplayProtocolHandler.ServerInfoHandler,
+            '/slideshow-features' : AirplayProtocolHandler.SlideshowFeaturesHandler,
             '/playback-info' : AirplayProtocolHandler.PlaybackInfoHandler,
             '/stop' : AirplayProtocolHandler.StopHandler,
         }
@@ -235,6 +236,7 @@ class AirplayProtocolHandler(object):
         """        
         
         def get(self):
+            self.set_header('Content-Type', 'text/x-apple-plist+xml')
             self.write(appletv.SERVER_INFO)
             
     class SlideshowFeaturesHandler(BaseHandler):
@@ -246,7 +248,13 @@ class AirplayProtocolHandler(object):
         """        
 
         def get(self):
-            self.write(appletv.SLIDESHOW_FEATURES)
+            """
+            I think slideshow effects should be implemented by the Airplay device.
+            The currently supported media backends do not support this.
+            
+            We'll just ignore this request, that'll enable the simple slideshow without effects.
+            """
+            pass
             
     class PlaybackInfoHandler(BaseHandler):
         """
@@ -254,4 +262,13 @@ class AirplayProtocolHandler(object):
         """
         
         def get(self):
-            pass
+            playing = self._media_backend.is_playing()
+            position, duration = self._media_backend.get_player_position()
+            
+            position = float(position)
+            duration = float(duration)
+            
+            body = appletv.PLAYBACK_INFO % (duration, duration, position, int(playing), duration)
+            
+            self.set_header('Content-Type', 'text/x-apple-plist+xml')
+            self.write(body)

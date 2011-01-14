@@ -102,7 +102,7 @@ class PlexMediaBackend(XBMCMediaBackend):
 
         self.log.warning('Failed to set start position')
         
-    def _is_playing(self):
+    def is_playing(self):
         """
         Determine if Plex is currently playing any media.
         
@@ -135,7 +135,7 @@ class PlexMediaBackend(XBMCMediaBackend):
         have to check if there's currently playing any media.
         """
         
-        if self._is_playing():
+        if self.is_playing():
             self._pause()
     
     def play(self):
@@ -151,7 +151,7 @@ class PlexMediaBackend(XBMCMediaBackend):
         If there's a response and the videoplayer is currently playing
         we can also send the play command.
         """        
-        if not self._is_playing():
+        if not self.is_playing():
             self._play()
         
     def get_player_position(self):

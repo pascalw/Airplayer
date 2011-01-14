@@ -86,6 +86,14 @@ class BaseMediaBackend(object):
         @returns int current position, int total length
         """
         raise NotImplementedError
+        
+    def is_playing(self):
+        """
+        Return wether the backend is currently playing any media.
+        
+        @returns boolean
+        """
+        raise NotImplementedError
     
     def set_player_position(self, position):
         """
