@@ -22,6 +22,8 @@ class AirplayProtocolHandler(object):
             (r'/rate', AirplayProtocolHandler.RateHandler, dict(media_backend=self._media_backend)),
             (r'/photo', AirplayProtocolHandler.PhotoHandler, dict(media_backend=self._media_backend)),
             (r'/authorize', AirplayProtocolHandler.AuthorizeHandler, dict(media_backend=self._media_backend)),
+            (r'/server-info', AirplayProtocolHandler.ServerInfoHandler, dict(media_backend=self._media_backend)),
+            (r'/slideshow-features', AirplayProtocolHandler.SlideshowFeaturesHandler, dict(media_backend=self._media_backend)),
             (r'/stop', AirplayProtocolHandler.StopHandler, dict(media_backend=self._media_backend)),
         ])
 
@@ -45,7 +47,7 @@ class AirplayProtocolHandler(object):
     
     class BaseHandler(tornado.web.RequestHandler):
         """
-        Base request handler, all other handler should inherit from this class.
+        Base request handler, all other handlers should inherit from this class.
 
         Provides some logging and media backend assignment.
         """
@@ -88,7 +90,10 @@ class AirplayProtocolHandler(object):
             body = HTTPHeaders.parse(self.request.body)
 
             if 'Content-Location' in body:
-                self._media_backend.play_movie(body['Content-Location'])
+                url = body['Content-Location']
+                log.debug('Playing %s', url)
+                
+                self._media_backend.play_movie(url)
 
                 if 'Start-Position' in body:
                     """ 
@@ -216,3 +221,25 @@ class AirplayProtocolHandler(object):
 
         def post(self):
             self._media_backend.stop_playing()
+            
+    class ServerInfoHandler(BaseHandler):
+        """
+        Handler for /server-info requests.
+        
+        Usage currently unknown.
+        Available from IOS 4.3.
+        """        
+        
+        def get(self):
+            pass        
+            
+    class SlideshowFeaturesHandler(BaseHandler):
+        """
+        Handler for /slideshow-features requests.
+
+        Usage currently unknown.
+        Available from IOS 4.3.
+        """        
+
+        def get(self):
+            pass
