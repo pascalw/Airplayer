@@ -107,11 +107,11 @@ class XBMCMediaBackend(BaseMediaBackend):
         
         For performance concerns, we only send this request once every minute.
         """
-        last_wakeup = self._last_wakeup
         now = time.time()
-        self._last_wakeup = now
         
-        if not last_wakeup or now - last_wakeup > 60:
+        if not self._last_wakeup or now - self._last_wakeup > 60:
+            self._last_wakeup = now
+            
             self.log.debug('Sending wake event')
             self._http_api_request('sendkey(ACTION_NONE)')
         
