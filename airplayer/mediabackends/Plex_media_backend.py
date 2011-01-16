@@ -79,6 +79,9 @@ class PlexMediaBackend(XBMCMediaBackend):
                 raise Exception('Invalid response item: ', line)    
             
             result[key] = value
+        
+        if 'Error' in result:
+            result['error'] = True
             
         return result
         
@@ -92,7 +95,7 @@ class PlexMediaBackend(XBMCMediaBackend):
         """
         for i in range(5):
             response = self.set_player_position_percentage(position_percentage)
-            if 'error' in response:
+            if 'error' in response and response['error']:
                 self.log.debug('Setting start position failed: %s', response)
                 time.sleep(1)
                 continue
@@ -165,10 +168,11 @@ class PlexMediaBackend(XBMCMediaBackend):
             total_str = response['Duration']
             time_str = response['Time']
             
-            total = utils.duration_to_seconds(total_str)
-            time = utils.duration_to_seconds(time_str)
+            if total_str and time_str:
+                total = utils.duration_to_seconds(total_str)
+                time = utils.duration_to_seconds(time_str)
             
-            return time, total
+                return time, total
             
         return None, None    
     

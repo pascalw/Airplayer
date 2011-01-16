@@ -243,4 +243,5 @@ class XBMCMediaBackend(BaseMediaBackend):
         
         @param percentage_position float
         """
-        thread.start_new_thread(self._set_start_position, (percentage_position,))
+        if percentage_position:
+            thread.start_new_thread(self._set_start_position, (percentage_position,))
