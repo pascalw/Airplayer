@@ -71,7 +71,7 @@ class XBMCMediaBackend(BaseMediaBackend):
             Protocol errors usually means a method could not be executed because
             for example a seek is requested when there's no movie playing.
             """
-            self.log.info('Caught protocol error %s', e)
+            self.log.debug('Caught protocol error %s', e)
             exception = e
         except Exception, e:
             exception = e

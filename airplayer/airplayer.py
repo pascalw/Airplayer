@@ -51,10 +51,10 @@ class Application(object):
         else:
             handler = logging.StreamHandler()
 
-        if getattr(settings, 'DEBUG', None) and settings.DEBUG:
+        if getattr(settings, 'DEBUG', None):
             loglevel = logging.DEBUG
         else:
-            loglevel = logging.WARNING
+            loglevel = logging.INFO
             
         self.log.setLevel(loglevel)
         handler.setFormatter(logging.Formatter(fmt, datefmt))
@@ -209,7 +209,7 @@ class Application(object):
         self.shutdown()    
 
 def main():
-    app = Application(6002)
+    app = Application(settings.AIRPLAYER_PORT)
     
     try:
         app.run()

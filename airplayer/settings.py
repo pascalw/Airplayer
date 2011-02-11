@@ -1,4 +1,11 @@
 """
+Port used by Airplayer.
+You should only need to change this in case port 6002 is already
+in use on your machine by other software.
+"""
+AIRPLAYER_PORT = 6002
+
+"""
 Set your media backend.
 Supported media backends are XBMC, Plex and Boxee.
 """
@@ -37,4 +44,4 @@ AIRPLAY_HOSTNAME = None
 """
 Debug mode, set to False to disable debug logging.
 """
-DEBUG = True
+DEBUG = False

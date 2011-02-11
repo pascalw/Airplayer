@@ -57,7 +57,7 @@ class AirplayProtocolHandler(object):
             self._media_backend = media_backend  
 
         def prepare(self):
-            log.info('%s %s', self.request.method, self.request.uri)
+            log.debug('%s %s', self.request.method, self.request.uri)
 
     class ReverseHandler(BaseHandler):
         """

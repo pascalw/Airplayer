@@ -38,7 +38,8 @@ Make sure all requirements are met (see above) and execute the following command
 
     pip install -r requirements.txt
     
-This will install the required python packages airplayer depends on.
+This will install the required python packages airplayer depends on. Note that, depending on your system
+configuration you might need to execute this command with sudo rights.
 
 Running
 =======

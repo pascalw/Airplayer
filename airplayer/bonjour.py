@@ -7,7 +7,7 @@ logger = logging.getLogger('airplayer')
 def register_service(name, regtype, port):
     def register_callback(sdRef, flags, errorCode, name, regtype, domain):
         if errorCode == pybonjour.kDNSServiceErr_NoError:
-            logger.info('Registered bonjour service %s', name)
+            logger.debug('Registered bonjour service %s.%s', name, regtype)
 
     record = pybonjour.TXTRecord({
         'deviceid' : 'FF:FF:FF:FF:FF:FF',
