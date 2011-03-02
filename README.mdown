@@ -18,7 +18,17 @@ Installing
 
 See INSTALL
     
-    
+
+VLC
+===
+The VLC backend uses the VLC HTTP interface. To enable this interface, do the following:
+
+1) Run "vlc -I http" from the command line
+2) Start vlc and then select View->Add Interface->Web Interface
+
+Airplayer can be run before or after VLC is started. So running it at startup should be
+fine (though that has not been extensively tested with this backend).
+
 Note
 =========
 This is pre-release software. It's pretty stable now but it still needs more testing

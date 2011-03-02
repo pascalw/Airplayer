@@ -16,7 +16,7 @@ class VLCMediaBackend(BaseMediaBackend):
     the VLC web interface be activated, which can be done in either of the following ways:
 
     1) Run "vlc -I http" from the command line
-    2) Run vlc and then select View->Add Interface->Web Interface
+    2) Start vlc and then select View->Add Interface->Web Interface
     """
 
     def __init__(self, host, port, username=None, password=None):
