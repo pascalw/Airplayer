@@ -7,13 +7,14 @@ AIRPLAYER_PORT = 6002
 
 """
 Set your media backend.
-Supported media backends are XBMC, Plex and Boxee.
+Supported media backends are XBMC, VLC, Plex and Boxee.
 """
 MEDIA_BACKEND = 'XBMC'
 
 """
 Default ports:
 XBMC: 8080
+VLC: 8080
 Plex: 3000
 Boxee: 8800
 """
