@@ -2,7 +2,11 @@ Airplayer
 ============
 Airplayer is a script to make media playing software Airplay-compatible.
 Airplayer features pluggable backends, making it possible to support different
-media players. Currently XBMC, Boxee and Plex are supported.
+media players.
+
+XBMC, Boxee and Plex are supported through included media backends.
+Third party backends for other media players might be available, see [Third Party Media Backends](https://github.com/PascalW/Airplayer/wiki/Third-party-media-backends/).
+
 To create your own media backend
 see [this wikipage](https://github.com/PascalW/XBMC-Airplayer/wiki/Media-backends).
 
