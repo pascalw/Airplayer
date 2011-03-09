@@ -1,0 +1,53 @@
+<html> 
+ <body> 
+  <h1>Configuring Airplayer to run as a Windows Service</h1>
+  <p>Guide contributed by <a href="https://github.com/smaccona">smaccona</a>.</p>
+  <ul> 
+   <li>First of all, get Airplayer working from the command line, so that you
+    know your configuration is correct.</li> 
+   <li>Download <a href='http://iain.cx/src/nssm/#download'>NSSM</a> and
+    uncompress it to a directory of your choice. In my example, it's in
+    <code>C:\Users\media\Downloads\nssm-2.9</code></li> 
+   <li>Open a command prompt. If running Windows Vista or Windows 7,
+    you will need to do this in elevated mode (using "Run As Administrator").
+    To do this quickly, hit the <em>Windows</em> key, type <code>cmd</code>,
+    then hold down the <em>Shift</em> and <em>Control</em> keys while you
+    press the <em>Enter</em> key.</li> 
+   <li>In the command prompt, navigate to the location you have extracted
+    NSSM to and then into the directory called <code>win32</code> (the
+    32-bit executables should work fine on both 32- and 64-bit installations
+    of Windows, but if you have trouble, try the <code>win64</code> directory
+    instead). Your command prompt window should look something like
+    this at this point:
+    <p><img src='cmd.png' /></p></li> 
+   <li>Type <code>nssm.exe install</code>  and hit
+    <em>Enter</em>. You should see the following dialog window:
+    <p><img src='nssm1.png' /></p></li> 
+   </li> 
+   <li>In the <em>Application</em> textbox, enter the full path to 
+    <code>python.exe</code> or use the browse button to locate it. In my
+    installation, it's at <code>C:\Python27\python.exe</code>.</li> 
+   <li>In the <em>Options</em> textbox, enter the full path to the
+    <code>airplayer.py</code> script in your Airplayer directory.
+    In my installation, this is <code>C:\Users\media\Downloads\PascalW-Airplayer-7a7873e\airplayer\airplayer.py</code></li> 
+   <li>In the <em>Service name</em> textbox, enter a name for your service.
+    I called mine <em>Airplayer (Boxee)</em></li> 
+   <li>Your dialog should now look something like this:
+    <p><img src='nssm2.png' /></p></li> 
+   </li> 
+   <li>Hit the <em>Install service</em> button to install the service.</li> 
+   <li>Provided you're running at administrator level and have the
+    necessary privileges, you should get a message that the service was
+    created:
+    <p><img src='nssm3.png' /></p></li> 
+   </li> 
+   <li>Navigate to <em>Start -> Control Panel -> Administrative Tools ->
+    Services</em>. You should see your newly-created service in the list.
+    <p><img src='services.png' /></p> 
+    To start it, just hit the button with the <em>Play</em> icon (or
+    right-click on it and click <em>Start</em>). If the service's
+    <em>Startup Type</em> is set to <em>Automatic</em>, then the service
+    should start automatically when your computer boots.</li> 
+  </ul> 
+ </body> 
+</html>
