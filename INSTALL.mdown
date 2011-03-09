@@ -41,8 +41,8 @@ Make sure all requirements are met (see above) and execute the following command
 This will install the required python packages airplayer depends on. Note that, depending on your system
 configuration you might need to execute this command with sudo rights.
 
-Running
-=======
+Running Airplayer
+=================
 
 Edit settings.py to reflect your setup. For help, read the comments in settings.py.
 
@@ -50,15 +50,15 @@ Airplayer can be run in the foreground in your terminal and in the background as
 It is advised to first try to run airplayer in your terminal before trying to run it in the background,
 as it will be easier to spot (configuration) issues when running in the foreground.
 
-Foreground
-----------
+Running in the foreground
+-------------------------
 
 To run airplayer in the foreground execute:
 
     python airplayer.py
     
-Background
-----------
+Running in the background
+-------------------------
 
 There are scripts included to make Airplayer run in the background on Ubuntu and Mac OS X.
 By installing this scripts, Airplayer will also start when your computer boots.
@@ -97,6 +97,6 @@ Airplayer will also automatically start when you login. Logs are stored in
 
 ### Windows
 
-This feauture is currently not supported on Windows. I'm not a Windows user myself, so I have no idea
-what's required to make a python script run as a Windows Service or something. If someone is interested
-in tinkering with this and writing some instructions, let me know.
+See [this guide](http://pascalw.github.com/Airplayer/airplayer-windows-service.html), contributed by
+[smaccona](https://github.com/smaccona), to install Airplayer
+as a Windows Service and making it automatically start at boot.
