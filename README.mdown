@@ -8,7 +8,7 @@ XBMC, Boxee and Plex are supported through included media backends.
 Third party backends for other media players might be available, see [Third Party Media Backends](https://github.com/PascalW/Airplayer/wiki/Third-party-media-backends/).
 
 To create your own media backend
-see [this wikipage](https://github.com/PascalW/XBMC-Airplayer/wiki/Media-backends).
+see [this wikipage](https://github.com/PascalW/Airplayer/wiki/Media-backends).
 
 Features
 ========
