@@ -1,6 +1,7 @@
 import select
 import pybonjour
 import logging
+import appletv
 
 logger = logging.getLogger('airplayer')
 
@@ -9,11 +10,7 @@ def register_service(name, regtype, port):
         if errorCode == pybonjour.kDNSServiceErr_NoError:
             logger.debug('Registered bonjour service %s.%s', name, regtype)
 
-    record = pybonjour.TXTRecord({
-        'deviceid' : 'FF:FF:FF:FF:FF:FF',
-        'features' : '0x7',
-        'model' : 'AppleTV2,1',
-    })
+    record = pybonjour.TXTRecord(appletv.DEVICE_INFO)
     
     service = pybonjour.DNSServiceRegister(name = name,
                                          regtype = regtype,

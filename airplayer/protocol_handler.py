@@ -1,4 +1,7 @@
 import logging
+import appletv
+
+import lib.biplist
 
 import tornado.httpserver
 import tornado.ioloop
@@ -15,18 +18,21 @@ class AirplayProtocolHandler(object):
         self._port = port
     
     def start(self):
-        handler_dict = {
+        handlers = {
             '/reverse' : AirplayProtocolHandler.ReverseHandler,
             '/play' : AirplayProtocolHandler.PlayHandler,
             '/scrub' : AirplayProtocolHandler.ScrubHandler,
             '/rate' : AirplayProtocolHandler.RateHandler,
             '/photo' : AirplayProtocolHandler.PhotoHandler,
             '/authorize' : AirplayProtocolHandler.AuthorizeHandler,
+            '/server-info' : AirplayProtocolHandler.ServerInfoHandler,
+            '/slideshow-features' : AirplayProtocolHandler.SlideshowFeaturesHandler,
+            '/playback-info' : AirplayProtocolHandler.PlaybackInfoHandler,
             '/stop' : AirplayProtocolHandler.StopHandler,
         }
         
-        handlers = [(url, handler_dict[url], dict(media_backend=self._media_backend)) for url in handler_dict.keys()] 
-        application = tornado.web.Application(handlers)
+        app_handlers = [(url, handlers[url], dict(media_backend=self._media_backend)) for url in handlers.keys()] 
+        application = tornado.web.Application(app_handlers)
 
         self._http_server = tornado.httpserver.HTTPServer(application)
         self._http_server.listen(self._port)
@@ -48,7 +54,7 @@ class AirplayProtocolHandler(object):
     
     class BaseHandler(tornado.web.RequestHandler):
         """
-        Base request handler, all other handler should inherit from this class.
+        Base request handler, all other handlers should inherit from this class.
 
         Provides some logging and media backend assignment.
         """
@@ -87,11 +93,17 @@ class AirplayProtocolHandler(object):
             backend communication.
             """
             self.finish()
-
-            body = HTTPHeaders.parse(self.request.body)
+            
+            if self.request.headers.get('Content-Type', None) == 'application/x-apple-binary-plist':
+                body = lib.biplist.readPlistFromString(self.request.body)
+            else:
+                body = HTTPHeaders.parse(self.request.body)    
 
             if 'Content-Location' in body:
-                self._media_backend.play_movie(body['Content-Location'])
+                url = body['Content-Location']
+                log.debug('Playing %s', url)
+                
+                self._media_backend.play_movie(url)
 
                 if 'Start-Position' in body:
                     """ 
@@ -219,3 +231,52 @@ class AirplayProtocolHandler(object):
 
         def post(self):
             self._media_backend.stop_playing()
+            
+    class ServerInfoHandler(BaseHandler):
+        """
+        Handler for /server-info requests.
+        
+        Usage currently unknown.
+        Available from IOS 4.3.
+        """        
+        
+        def get(self):
+            self.set_header('Content-Type', 'text/x-apple-plist+xml')
+            self.write(appletv.SERVER_INFO)
+            
+    class SlideshowFeaturesHandler(BaseHandler):
+        """
+        Handler for /slideshow-features requests.
+
+        Usage currently unknown.
+        Available from IOS 4.3.
+        """        
+
+        def get(self):
+            """
+            I think slideshow effects should be implemented by the Airplay device.
+            The currently supported media backends do not support this.
+            
+            We'll just ignore this request, that'll enable the simple slideshow without effects.
+            """
+            pass
+            
+    class PlaybackInfoHandler(BaseHandler):
+        """
+        Handler for /playback-info requests.
+        """
+        
+        def get(self):
+            playing = self._media_backend.is_playing()
+            position, duration = self._media_backend.get_player_position()
+            
+            if not position:
+                position = duration = 0
+            else:    
+                position = float(position)
+                duration = float(duration)
+            
+            body = appletv.PLAYBACK_INFO % (duration, duration, position, int(playing), duration)
+            
+            self.set_header('Content-Type', 'text/x-apple-plist+xml')
+            self.write(body)
