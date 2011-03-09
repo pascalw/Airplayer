@@ -1,6 +1,8 @@
 import logging
 import appletv
 
+import lib.biplist
+
 import tornado.httpserver
 import tornado.ioloop
 import tornado.web
@@ -91,8 +93,11 @@ class AirplayProtocolHandler(object):
             backend communication.
             """
             self.finish()
-
-            body = HTTPHeaders.parse(self.request.body)
+            
+            if self.request.headers.get('Content-Type', None) == 'application/x-apple-binary-plist':
+                body = lib.biplist.readPlistFromString(self.request.body)
+            else:
+                body = HTTPHeaders.parse(self.request.body)    
 
             if 'Content-Location' in body:
                 url = body['Content-Location']
@@ -265,8 +270,11 @@ class AirplayProtocolHandler(object):
             playing = self._media_backend.is_playing()
             position, duration = self._media_backend.get_player_position()
             
-            position = float(position)
-            duration = float(duration)
+            if not position:
+                position = duration = 0
+            else:    
+                position = float(position)
+                duration = float(duration)
             
             body = appletv.PLAYBACK_INFO % (duration, duration, position, int(playing), duration)
             
