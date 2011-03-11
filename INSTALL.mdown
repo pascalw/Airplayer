@@ -3,7 +3,7 @@ General requirements
 
 To run airplayer, you'll need:
 
-* Python (>= 2.5)
+* Python (>= 2.6)
 * Pip
 * A compatible DNS-SD library (such as Avahi), on OSX this is installed by default
 
