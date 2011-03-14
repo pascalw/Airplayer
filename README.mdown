@@ -30,7 +30,7 @@ on different systems and different setups.
 
 If you run into any problems, please don't hesitate to report it.
 
-Known bugs:
+Known bugs/issues:
 
 * When playing a movie, the timer sometimes skips a second. This is due to the fact that the
 XBMC API sometimes doesn't respond fast enough to get the current player position.
@@ -40,3 +40,5 @@ to do this. I've worked around this by just starting the movie from the beginnin
 to the specified start position. This works, but you'll probably see a split second of the beginning
 of the movie before XBMC seeks to the start position.
 * It's not possible to stream DRM protocted content (yet).
+* A lot of third party apps use m3u8 files for streaming content. Unfortunately XBMC, Plex and Boxee do not
+support this format yet. See [this XBMC ticket](http://trac.xbmc.org/ticket/11175) for more information.
