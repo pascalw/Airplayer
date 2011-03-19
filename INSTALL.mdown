@@ -16,7 +16,7 @@ Linux
 On Linux you'll have to install a compatible DNS-SD library.
 For Ubuntu you should install the following package:
     
-    apt-get install libavahi-compat-libdnssd1
+    apt-get install libavahi-compat-libdnssd1 python-setuptools python-pip python-dev
 
 On other Linux distributions you'll have to install a similar package.
     
