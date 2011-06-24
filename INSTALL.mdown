@@ -14,9 +14,17 @@ Linux
 -----
 
 On Linux you'll have to install a compatible DNS-SD library.
+
+#### Ubuntu
 For Ubuntu you should install the following package:
     
     apt-get install libavahi-compat-libdnssd1 python-setuptools python-pip python-dev
+
+#### Fedora
+
+    yum install python-setuptools python-pip python-devel avahi-compat-libdns_sd
+
+#### Other
 
 On other Linux distributions you'll have to install a similar package.
     
