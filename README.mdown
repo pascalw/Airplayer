@@ -1,3 +1,6 @@
+**WARNING: Airplayer is no longer under active development.
+XBMC users can use the built-in Airplay support which is available since XBMC 11 (Eden).**
+
 Airplayer
 ============
 Airplayer is a script to make media playing software Airplay-compatible.
